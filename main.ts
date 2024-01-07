@@ -1,17 +1,15 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
+interface HanayamaHuzzlesTrackerPluginSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: HanayamaHuzzlesTrackerPluginSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
+	settings: HanayamaHuzzlesTrackerPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -108,9 +106,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: HanayamaHuzzlesTrackerPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: HanayamaHuzzlesTrackerPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
