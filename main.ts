@@ -1,6 +1,8 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
+import remarkGFM from 'remark-gfm';
 import { Editor, MarkdownView, Plugin } from 'obsidian';
+import { remark } from 'remark';
 
 export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	private static #startMarker: string = '<!-- Hanayama Huzzles start -->';
@@ -31,11 +33,22 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		if (match != null && match.groups != null && match.groups.markdownList != null) {
 			const markdownList: string = match.groups.markdownList;
 			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
-			const updatedContent: string = content.replace(regex, `${HanayamaHuzzlesTrackerPlugin.#startMarker}${updatedMarkdownList}${HanayamaHuzzlesTrackerPlugin.#endMarker}`);
+			const updatedContent: string = content.replace(
+				regex,
+				dedent
+					`${HanayamaHuzzlesTrackerPlugin.#startMarker}
+
+					${updatedMarkdownList}
+
+					${HanayamaHuzzlesTrackerPlugin.#endMarker}`
+			);
 
 			return updatedContent;
 		} else {
-			const markdownList: string = 'updated list';
+			const markdownList: string = dedent
+				`First | Second
+				--- | ---
+				A | x`;
 			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
 
 			return dedent
@@ -50,6 +63,48 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	}
 
 	private #updatedMarkdownList(markdownList: string): string {
-		return markdownList.toUpperCase();
+		const list = this.#markdownTableToArrayOfArrays(markdownList);
+
+		list[1][1] = list[1][1].toUpperCase();
+
+		return this.#arrayOfArraysToMarkdownTableString(list);
+	}
+
+	private #arrayOfArraysToMarkdownTableString(arrayOfArrays) {
+		const table = {
+			type: 'table',
+			children: arrayOfArrays.map(
+				row => ({
+					type: 'tableRow',
+					children: row.map(
+						cell => ({
+							type: 'tableCell',
+							children: [{
+								type: 'text',
+								value: cell.toString()
+							}]
+						})
+					)
+				})
+			)
+		};
+
+		return remark()
+			.use(remarkGFM)
+			.stringify(table)
+			.replace(/\n$/, '');
+	}
+
+	private #markdownTableToArrayOfArrays(markdownTableString) {
+		const ast = remark()
+			.use(remarkGFM)
+			.parse(markdownTableString);
+		const table = ast.children.find(node => node.type === 'table');
+
+		return table.children.map(
+			row => row.children.map(
+				cell => cell.children[0].value
+			)
+		);
 	}
 }
