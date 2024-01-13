@@ -3,10 +3,10 @@ import { Editor, MarkdownView, Plugin } from 'obsidian';
 export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	async onload() {
 		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
+			id: 'update-list',
+			name: 'Update list',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('Sample Editor Command');
+				editor.replaceSelection('Update list');
 			}
 		});
 	}
