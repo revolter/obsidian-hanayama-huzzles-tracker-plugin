@@ -25,31 +25,31 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		const escapedStartMarker: string = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#startMarker);
 		const escapedEndMarker: string = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#endMarker);
 
-		const regex: RegExp = new RegExp(`${escapedStartMarker}(?<list>.*?)${escapedEndMarker}`, 's');
+		const regex: RegExp = new RegExp(`${escapedStartMarker}(?<markdownList>.*?)${escapedEndMarker}`, 's');
 		const match: [string] = content.match(regex);
 
-		if (match != null && match.groups != null && match.groups.list != null) {
-			const list: string = match.groups.list;
-			const updatedList: string = this.#updatedList(list);
-			const updatedContent: string = content.replace(regex, `${HanayamaHuzzlesTrackerPlugin.#startMarker}${updatedList}${HanayamaHuzzlesTrackerPlugin.#endMarker}`);
+		if (match != null && match.groups != null && match.groups.markdownList != null) {
+			const markdownList: string = match.groups.markdownList;
+			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
+			const updatedContent: string = content.replace(regex, `${HanayamaHuzzlesTrackerPlugin.#startMarker}${updatedMarkdownList}${HanayamaHuzzlesTrackerPlugin.#endMarker}`);
 
 			return updatedContent;
 		} else {
-			const list: string = 'updated list';
-			const updatedList: string = this.#updatedList(list);
+			const markdownList: string = 'updated list';
+			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
 
 			return dedent
 				`${content}
 
 				${HanayamaHuzzlesTrackerPlugin.#startMarker}
 
-				${updatedList}
+				${updatedMarkdownList}
 
 				${HanayamaHuzzlesTrackerPlugin.#endMarker}`;
 		}
 	}
 
-	private #updatedList(list: string): string {
-		return list.toUpperCase();
+	private #updatedMarkdownList(markdownList: string): string {
+		return markdownList.toUpperCase();
 	}
 }
