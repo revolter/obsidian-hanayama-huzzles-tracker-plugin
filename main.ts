@@ -33,7 +33,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		if (match != null && match.groups != null && match.groups.markdownList != null) {
 			const markdownList: string = match.groups.markdownList;
 			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
-			const updatedContent: string = content.replace(
+
+			return content.replace(
 				regex,
 				dedent
 					`${HanayamaHuzzlesTrackerPlugin.#startMarker}
@@ -42,8 +43,6 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 					${HanayamaHuzzlesTrackerPlugin.#endMarker}`
 			);
-
-			return updatedContent;
 		} else {
 			const markdownList: string = dedent
 				`First | Second
