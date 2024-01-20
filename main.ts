@@ -62,14 +62,14 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	}
 
 	private #updatedMarkdownList(markdownList: string): string {
-		const list = this.#markdownTableToArrayOfArrays(markdownList);
+		const list: [[string]] = this.#markdownTableToArrayOfArrays(markdownList);
 
 		list[1][1] = list[1][1].toUpperCase();
 
 		return this.#arrayOfArraysToMarkdownTableString(list);
 	}
 
-	private #arrayOfArraysToMarkdownTableString(arrayOfArrays) {
+	private #arrayOfArraysToMarkdownTableString(arrayOfArrays: [[string]]): string {
 		const table = {
 			type: 'table',
 			children: arrayOfArrays.map(
@@ -94,7 +94,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			.replace(/\n$/, '');
 	}
 
-	private #markdownTableToArrayOfArrays(markdownTableString) {
+	private #markdownTableToArrayOfArrays(markdownTableString: string): [[string]] {
 		const ast = remark()
 			.use(remarkGFM)
 			.parse(markdownTableString);
