@@ -1,8 +1,8 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
-import remarkGFM from 'remark-gfm';
 import { Editor, MarkdownView, Plugin } from 'obsidian';
 import { remark } from 'remark';
+import remarkGFM from 'remark-gfm';
 
 export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	static #startMarker: string = '<!-- Hanayama Huzzles start -->';
