@@ -34,15 +34,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			const markdownList: string = match.groups.markdownList;
 			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
 
-			return content.replace(
-				regex,
-				dedent
-					`${HanayamaHuzzlesTrackerPlugin.#startMarker}
-
-					${updatedMarkdownList}
-
-					${HanayamaHuzzlesTrackerPlugin.#endMarker}`
-			);
+			return content.replace(regex, updatedMarkdownList);
 		} else {
 			const markdownList: string = dedent
 				`First | Second
@@ -53,11 +45,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			return dedent
 				`${content}
 
-				${HanayamaHuzzlesTrackerPlugin.#startMarker}
-
-				${updatedMarkdownList}
-
-				${HanayamaHuzzlesTrackerPlugin.#endMarker}`;
+				${updatedMarkdownList}`;
 		}
 	}
 
@@ -66,7 +54,14 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 		list[1][1] = list[1][1].toUpperCase();
 
-		return this.#arrayOfArraysToMarkdownTableString(list);
+		const updatedList: string = this.#arrayOfArraysToMarkdownTableString(list);
+
+		return dedent
+			`${HanayamaHuzzlesTrackerPlugin.#startMarker}
+
+			${updatedList}
+
+			${HanayamaHuzzlesTrackerPlugin.#endMarker}`;
 	}
 
 	private #arrayOfArraysToMarkdownTableString(arrayOfArrays: [[string]]): string {
