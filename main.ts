@@ -1,8 +1,10 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
+import { Table, Text } from 'mdast';
 import { Editor, MarkdownView, Plugin } from 'obsidian';
 import { remark } from 'remark';
 import remarkGFM from 'remark-gfm';
+import { Root } from 'remark-gfm/lib';
 
 export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	static #startMarker: string = '<!-- Hanayama Huzzles start -->';
@@ -28,11 +30,11 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		const escapedEndMarker: string = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#endMarker);
 
 		const regex: RegExp = new RegExp(`${escapedStartMarker}(?<markdownList>.*?)${escapedEndMarker}`, 's');
-		const match: [string] = content.match(regex);
+		const match: RegExpMatchArray | null = content.match(regex);
 
 		if (match != null && match.groups != null && match.groups.markdownList != null) {
 			const markdownList: string = match.groups.markdownList;
-			const list: [[string]] = this.#markdownTableToArrayOfArrays(markdownList);
+			const list: string[][] = this.#markdownTableToArrayOfArrays(markdownList);
 			const updatedMarkdownList: string = this.#updatedMarkdownList(list);
 
 			return content.replace(regex, updatedMarkdownList);
@@ -46,7 +48,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		}
 	}
 
-	#updatedMarkdownList(list: [[string]]): string {
+	#updatedMarkdownList(list: string[][]): string {
 		if (list.length > 0) {
 			list[1][1] = list[1][1].toUpperCase();
 		}
@@ -61,8 +63,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			${HanayamaHuzzlesTrackerPlugin.#endMarker}`;
 	}
 
-	#arrayOfArraysToMarkdownTableString(arrayOfArrays: [[string]]): string {
-		const table = {
+	#arrayOfArraysToMarkdownTableString(arrayOfArrays: string[][]): string {
+		const table: Table = {
 			type: 'table',
 			children: arrayOfArrays.map(
 				row => ({
@@ -79,22 +81,26 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				})
 			)
 		};
+		const root: Root = {
+			type: 'root',
+			children: [table]
+		};
 
 		return remark()
 			.use(remarkGFM)
-			.stringify(table)
+			.stringify(root)
 			.replace(/\n$/, '');
 	}
 
-	#markdownTableToArrayOfArrays(markdownTableString: string): [[string]] {
+	#markdownTableToArrayOfArrays(markdownTableString: string): string[][] {
 		const ast = remark()
 			.use(remarkGFM)
 			.parse(markdownTableString);
-		const table = ast.children.find(node => node.type === 'table');
+		const table: Table = ast.children.find(node => node.type === 'table') as Table;
 
 		return table.children.map(
 			row => row.children.map(
-				cell => cell.children[0].value
+				cell => (cell.children[0] as Text).value
 			)
 		);
 	}
