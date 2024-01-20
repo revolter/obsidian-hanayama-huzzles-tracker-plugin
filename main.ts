@@ -5,8 +5,8 @@ import { Editor, MarkdownView, Plugin } from 'obsidian';
 import { remark } from 'remark';
 
 export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
-	private static #startMarker: string = '<!-- Hanayama Huzzles start -->';
-	private static #endMarker: string = '<!-- Hanayama Huzzles end -->';
+	static #startMarker: string = '<!-- Hanayama Huzzles start -->';
+	static #endMarker: string = '<!-- Hanayama Huzzles end -->';
 
 	async onload() {
 		this.addCommand({
@@ -23,7 +23,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 	onunload() {}
 
-	private #updatedListInContent(content: string): string {
+	#updatedListInContent(content: string): string {
 		const escapedStartMarker: string = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#startMarker);
 		const escapedEndMarker: string = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#endMarker);
 
@@ -46,7 +46,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		}
 	}
 
-	private #updatedMarkdownList(list: [[string]]): string {
+	#updatedMarkdownList(list: [[string]]): string {
 		if (list.length > 0) {
 			list[1][1] = list[1][1].toUpperCase();
 		}
@@ -61,7 +61,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			${HanayamaHuzzlesTrackerPlugin.#endMarker}`;
 	}
 
-	private #arrayOfArraysToMarkdownTableString(arrayOfArrays: [[string]]): string {
+	#arrayOfArraysToMarkdownTableString(arrayOfArrays: [[string]]): string {
 		const table = {
 			type: 'table',
 			children: arrayOfArrays.map(
@@ -86,7 +86,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			.replace(/\n$/, '');
 	}
 
-	private #markdownTableToArrayOfArrays(markdownTableString: string): [[string]] {
+	#markdownTableToArrayOfArrays(markdownTableString: string): [[string]] {
 		const ast = remark()
 			.use(remarkGFM)
 			.parse(markdownTableString);
