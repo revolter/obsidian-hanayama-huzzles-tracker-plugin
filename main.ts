@@ -32,7 +32,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 		if (match != null && match.groups != null && match.groups.markdownList != null) {
 			const markdownList: string = match.groups.markdownList;
-			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
+			const list: [[string]] = this.#markdownTableToArrayOfArrays(markdownList);
+			const updatedMarkdownList: string = this.#updatedMarkdownList(list);
 
 			return content.replace(regex, updatedMarkdownList);
 		} else {
@@ -40,7 +41,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				`First | Second
 				--- | ---
 				A | x`;
-			const updatedMarkdownList: string = this.#updatedMarkdownList(markdownList);
+			const list: [[string]] = this.#markdownTableToArrayOfArrays(markdownList);
+			const updatedMarkdownList: string = this.#updatedMarkdownList(list);
 
 			return dedent
 				`${content}
@@ -49,9 +51,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		}
 	}
 
-	private #updatedMarkdownList(markdownList: string): string {
-		const list: [[string]] = this.#markdownTableToArrayOfArrays(markdownList);
-
+	private #updatedMarkdownList(list: [[string]]): string {
 		list[1][1] = list[1][1].toUpperCase();
 
 		const updatedList: string = this.#arrayOfArraysToMarkdownTableString(list);
