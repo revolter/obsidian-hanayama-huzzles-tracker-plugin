@@ -67,20 +67,16 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	#arrayOfArraysToMarkdownTableString(arrayOfArrays: string[][]): string {
 		const table: Table = {
 			type: 'table',
-			children: arrayOfArrays.map(
-				row => ({
-					type: 'tableRow',
-					children: row.map(
-						cell => ({
-							type: 'tableCell',
-							children: [{
-								type: 'text',
-								value: cell
-							}]
-						})
-					)
-				})
-			)
+			children: arrayOfArrays.map(row => ({
+				type: 'tableRow',
+				children: row.map(cell => ({
+					type: 'tableCell',
+					children: [{
+						type: 'text',
+						value: cell
+					}]
+				}))
+			}))
 		};
 		const root: Root = {
 			type: 'root',
@@ -99,9 +95,9 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			.parse(markdownTableString);
 		const table: Table = ast.children.find(node => node.type === 'table') as Table;
 
-		return table.children.map(
-			row => row.children.map(
-				cell => cell.children.map(child => {
+		return table.children.map(row =>
+			row.children.map(cell =>
+				cell.children.map(child => {
 					switch (child.type) {
 						case 'image': return `![${child.alt}](${child.url})`
 						default: return toString(child)
