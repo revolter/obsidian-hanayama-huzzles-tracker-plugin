@@ -1,6 +1,6 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
-import { PhrasingContent, Table, TableCell, Text } from 'mdast';
+import { Image, PhrasingContent, Table, TableCell, Text } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import { Notice, Plugin, requestUrl } from 'obsidian';
 import { remark } from 'remark';
@@ -139,19 +139,15 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				this.#textTableCellNode(huzzle.level),
 				this.#textTableCellNode(huzzle.index),
 				this.#textTableCellNode(huzzle.name),
-				this.#tableCellNode([
-					{
-						type: 'image',
-						alt: '|100',
-						url: huzzle.imageLinks[0]
-					},
-					this.#textNode(' '),
-					{
-						type: 'image',
-						alt: '|100',
-						url: huzzle.imageLinks[1]
-					}
-				]),
+				this.#tableCellNode(
+					this.#interleave(
+						[
+							this.#imageNode(huzzle.imageLinks[0], 100),
+							this.#imageNode(huzzle.imageLinks[1], 100),
+						],
+						this.#textNode(' ')
+					)
+				),
 				this.#textTableCellNode(huzzle.status)
 			]
 		}));
@@ -190,6 +186,18 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			type: 'text',
 			value: text
 		}
+	}
+
+	#imageNode(url: string, size: number): Image {
+		return {
+			type: 'image',
+			alt: `|${size}`,
+			url: url
+		}
+	}
+
+	#interleave(array: any[], separator: any) {
+		return array.flatMap(element => [separator, element]).slice(1);
 	}
 
 	#markdownTableToHuzzles(markdownTableString: string): HanayamaHuzzle[] {
