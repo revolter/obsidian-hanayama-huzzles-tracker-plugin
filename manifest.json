@@ -3,9 +3,9 @@
 	"name": "Hanayama Huzzles Tracker",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "Hanayama Huzzle puzzles tracker",
+	"author": "Iulian Onofrei",
+	"authorUrl": "https://iulianonofrei.com",
+	"fundingUrl": "https://paypal.me/IulianOnofrei",
 	"isDesktopOnly": false
 }
