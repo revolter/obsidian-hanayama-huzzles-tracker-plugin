@@ -1,6 +1,6 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
-import { Table } from 'mdast';
+import { Table, TableCell } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import { Notice, Plugin, requestUrl } from 'obsidian';
 import { remark } from 'remark';
@@ -131,55 +131,31 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	#huzzlesToMarkdownTableString(headers: string[], huzzles: HanayamaHuzzle[]): string {
 		const headerRow = {
 			type: 'tableRow',
-			children: headers.map(header => ({
-				type: 'tableCell',
-				children: [{
-					type: 'text',
-					value: header
-				}]
-			}))
+			children: headers.map(header => this.#textTableCellNode(header))
 		};
 		const huzzleRows = huzzles.map(huzzle => ({
 			type: 'tableRow',
-			children: [{
-				type: 'tableCell',
-				children: [{
-					type: 'text',
-					value: huzzle.level
-				}]
-			}, {
-				type: 'tableCell',
-				children: [{
-					type: 'text',
-					value: huzzle.index
-				}]
-			}, {
-				type: 'tableCell',
-				children: [{
-					type: 'text',
-					value: huzzle.name
-				}]
-			}, {
-				type: 'tableCell',
-				children: [{
-					type: 'image',
-					alt: '|100',
-					url: huzzle.imageLinks[0]
-				}, {
-					type: 'text',
-					value: ' '
-				}, {
-					type: 'image',
-					alt: '|100',
-					url: huzzle.imageLinks[1]
-				}]
-			}, {
-				type: 'tableCell',
-				children: [{
-					type: 'text',
-					value: huzzle.status
-				}]
-			}]
+			children: [
+				this.#textTableCellNode(huzzle.level),
+				this.#textTableCellNode(huzzle.index),
+				this.#textTableCellNode(huzzle.name),
+				{
+					type: 'tableCell',
+					children: [{
+						type: 'image',
+						alt: '|100',
+						url: huzzle.imageLinks[0]
+					}, {
+						type: 'text',
+						value: ' '
+					}, {
+						type: 'image',
+						alt: '|100',
+						url: huzzle.imageLinks[1]
+					}]
+				},
+				this.#textTableCellNode(huzzle.status)
+			]
 		}));
 		const tableRows = [
 			...[headerRow],
@@ -198,6 +174,16 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			.use(remarkGFM)
 			.stringify(root)
 			.replace(/\n$/, '');
+	}
+
+	#textTableCellNode(text: string): TableCell {
+		return {
+			type: 'tableCell',
+			children: [{
+				type: 'text',
+				value: text
+			}]
+		}
 	}
 
 	#markdownTableToHuzzles(markdownTableString: string): HanayamaHuzzle[] {
