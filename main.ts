@@ -1,6 +1,7 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
-import { Table, Text } from 'mdast';
+import { Table } from 'mdast';
+import { toString } from 'mdast-util-to-string';
 import { Editor, MarkdownView, Plugin } from 'obsidian';
 import { remark } from 'remark';
 import remarkGFM from 'remark-gfm';
@@ -100,7 +101,12 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 		return table.children.map(
 			row => row.children.map(
-				cell => (cell.children[0] as Text).value
+				cell => cell.children.map(child => {
+					switch (child.type) {
+						case 'image': return `![${child.alt}](${child.url})`
+						default: return toString(child)
+					}
+				}).join('')
 			)
 		);
 	}
