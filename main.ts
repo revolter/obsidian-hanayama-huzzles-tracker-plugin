@@ -1,6 +1,6 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
-import { Table, TableCell } from 'mdast';
+import { Table, TableCell, Text } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import { Notice, Plugin, requestUrl } from 'obsidian';
 import { remark } from 'remark';
@@ -141,18 +141,19 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				this.#textTableCellNode(huzzle.name),
 				{
 					type: 'tableCell',
-					children: [{
-						type: 'image',
-						alt: '|100',
-						url: huzzle.imageLinks[0]
-					}, {
-						type: 'text',
-						value: ' '
-					}, {
-						type: 'image',
-						alt: '|100',
-						url: huzzle.imageLinks[1]
-					}]
+					children: [
+						{
+							type: 'image',
+							alt: '|100',
+							url: huzzle.imageLinks[0]
+						},
+						this.#textNode(' '),
+						{
+							type: 'image',
+							alt: '|100',
+							url: huzzle.imageLinks[1]
+						}
+					]
 				},
 				this.#textTableCellNode(huzzle.status)
 			]
@@ -179,10 +180,14 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	#textTableCellNode(text: string): TableCell {
 		return {
 			type: 'tableCell',
-			children: [{
-				type: 'text',
-				value: text
-			}]
+			children: [this.#textNode(text)]
+		}
+	}
+
+	#textNode(text: string): Text {
+		return {
+			type: 'text',
+			value: text
 		}
 	}
 
