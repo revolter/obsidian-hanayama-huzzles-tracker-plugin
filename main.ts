@@ -75,7 +75,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 							type: 'tableCell',
 							children: [{
 								type: 'text',
-								value: cell.toString()
+								value: cell
 							}]
 						})
 					)
