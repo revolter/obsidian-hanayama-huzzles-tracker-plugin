@@ -21,6 +21,14 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	static #startMarker: string = '<!-- Hanayama Huzzles start -->';
 	static #endMarker: string = '<!-- Hanayama Huzzles end -->';
 	static #headers: string[] = ['Level', 'Index', 'Name', 'Picture', 'Status'];
+	static #scrapeUrls: string[] = [
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-1-fun',
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-2-easy',
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-3-normal',
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-4-hard',
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-5-expert',
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-6-grand-master'
+	]
 
 	async onload() {
 		this.addCommand({
@@ -75,7 +83,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			return map;
 		}, {} as {[key: string]: string});
 
-		const huzzles = await this.#scrapeHuzzles();
+		const huzzles = (await this.#scrapeAllHuzzles()).flat();
 		huzzles.forEach( huzzle => {
 			huzzle.status = indexedList[huzzle.name] || '';
 		});
@@ -90,8 +98,14 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			${HanayamaHuzzlesTrackerPlugin.#endMarker}`;
 	}
 
-	async #scrapeHuzzles(): Promise<HanayamaHuzzle[]> {
-		const response = await requestUrl('https://hanayama-toys.com/product-category/puzzles/huzzle/level-1-fun');
+	async #scrapeAllHuzzles(): Promise<HanayamaHuzzle[][]> {
+		return await Promise.all(HanayamaHuzzlesTrackerPlugin.#scrapeUrls.flatMap(async url => {
+			return await this.#scrapeHuzzles(url);
+		}));
+	}
+
+	async #scrapeHuzzles(url: string): Promise<HanayamaHuzzle[]> {
+		const response = await requestUrl(url);
 
 		const container = document.createElement('template');
 		container.innerHTML = response.text;
