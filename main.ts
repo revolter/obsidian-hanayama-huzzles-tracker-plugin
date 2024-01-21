@@ -57,12 +57,12 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 		if (match != null && match.groups != null) {
 			const markdownList: string = match.groups.markdownList;
-			const list: string[][] = this.#markdownTableToArrayOfArrays(markdownList);
-			const updatedMarkdownList: string = await this.#updatedMarkdownList(list);
+			const currentHuzzles: HanayamaHuzzle[] = this.#markdownTableToHuzzles(markdownList);
+			const updatedMarkdownList: string = await this.#updatedHuzzles(currentHuzzles);
 
 			return content.replace(regex, updatedMarkdownList);
 		} else {
-			const updatedMarkdownList: string = await this.#updatedMarkdownList([]);
+			const updatedMarkdownList: string = await this.#updatedHuzzles([]);
 
 			return dedent
 				`${content}
@@ -71,21 +71,16 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		}
 	}
 
-	async #updatedMarkdownList(list: string[][]): Promise<string> {
-		const indexedList = list.slice(1).reduce((map, element) => {
-			if (element.length >= 5) {
-				const name = element[2];
-				const status = element[4];
-
-				map[name] = status;
-			}
+	async #updatedHuzzles(currentHuzzles: HanayamaHuzzle[]): Promise<string> {
+		const indexedCurrentHuzzles = currentHuzzles.slice(1).reduce((map, huzzle) => {
+			map[huzzle.name] = huzzle.status;
 
 			return map;
 		}, {} as {[key: string]: string});
 
 		const huzzles = (await this.#scrapeAllHuzzles()).flat();
 		huzzles.forEach( huzzle => {
-			huzzle.status = indexedList[huzzle.name] || '';
+			huzzle.status = indexedCurrentHuzzles[huzzle.name] || '';
 		});
 
 		const updatedList: string = this.#huzzlesToMarkdownTableString(HanayamaHuzzlesTrackerPlugin.#headers, huzzles);
@@ -205,13 +200,12 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			.replace(/\n$/, '');
 	}
 
-	#markdownTableToArrayOfArrays(markdownTableString: string): string[][] {
+	#markdownTableToHuzzles(markdownTableString: string): HanayamaHuzzle[] {
 		const ast = remark()
 			.use(remarkGFM)
 			.parse(markdownTableString);
 		const table: Table = ast.children.find(node => node.type === 'table') as Table;
-
-		return table.children.map(row =>
+		const arrayOfArrays = table.children.map(row =>
 			row.children.map(cell =>
 				cell.children.map(child => {
 					switch (child.type) {
@@ -221,5 +215,30 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				}).join('')
 			)
 		);
+		const imageLinksRegex: RegExp = new RegExp(/(?<=!\[[^\]]+\]\()(?<link>[^)]+)(?=\))/g); // https://regex101.com/r/YlCOgc/1
+
+		return arrayOfArrays.flatMap(array => {
+			if (array.length < 5) {
+				return [];
+			}
+
+			const level = array[0];
+			const index = array[1];
+			const name = array[2];
+
+			const images = array[3];
+			const imageLinkMatches = images.matchAll(imageLinksRegex);
+			const imageLinks = Array.from(imageLinkMatches).flatMap(match => {
+				if (match == null || match.groups == null) {
+					return [];
+				}
+
+				return match.groups.link;
+			});
+
+			const status = array[4];
+
+			return new HanayamaHuzzle(level, index, name, imageLinks, status);
+		});
 	}
 }
