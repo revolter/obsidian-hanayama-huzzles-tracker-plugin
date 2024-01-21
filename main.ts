@@ -64,10 +64,11 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		} else {
 			const updatedMarkdownList = await this.#updatedHuzzles([]);
 
-			return dedent
-				`${content}
+			return dedent`
+				${content}
 
-				${updatedMarkdownList}`;
+				${updatedMarkdownList}
+			`;
 		}
 	}
 
@@ -85,12 +86,13 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 		const updatedList = this.#huzzlesToMarkdownTableString(HanayamaHuzzlesTrackerPlugin.#headers, huzzles);
 
-		return dedent
-			`${HanayamaHuzzlesTrackerPlugin.#startMarker}
+		return dedent`
+			${HanayamaHuzzlesTrackerPlugin.#startMarker}
 
 			${updatedList}
 
-			${HanayamaHuzzlesTrackerPlugin.#endMarker}`;
+			${HanayamaHuzzlesTrackerPlugin.#endMarker}
+		`;
 	}
 
 	async #scrapeAllHuzzles(): Promise<HanayamaHuzzle[][]> {
@@ -150,7 +152,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		]
 		const table: Table = {
 			type: 'table',
-			children: tableRows as any // https://stackoverflow.com/a/47219058/865175
+			children: tableRows as never // https://stackoverflow.com/a/47219058/865175
 		};
 		const root: Root = {
 			type: 'root',
@@ -196,7 +198,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		}
 	}
 
-	#interleave(array: any[], separator: any) {
+	#interleave<Array extends PhrasingContent, Separator extends PhrasingContent>(array: Array[], separator: Separator) {
 		return array.flatMap(element => [separator, element]).slice(1);
 	}
 
