@@ -2,7 +2,7 @@ import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
 import { Table } from 'mdast';
 import { toString } from 'mdast-util-to-string';
-import { Editor, MarkdownView, Plugin, requestUrl } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, requestUrl } from 'obsidian';
 import { remark } from 'remark';
 import remarkGFM from 'remark-gfm';
 import { Root } from 'remark-gfm/lib';
@@ -31,6 +31,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 				this.#updatedListInContent(content).then( newContent => {
 					editor.setValue(newContent);
+
+					new Notice('List updated!');
 				});
 			}
 		});
