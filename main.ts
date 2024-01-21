@@ -141,10 +141,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				this.#textTableCellNode(huzzle.name),
 				this.#tableCellNode(
 					this.#interleave(
-						[
-							this.#imageNode(huzzle.imageLinks[0], 100),
-							this.#imageNode(huzzle.imageLinks[1], 100),
-						],
+						huzzle.imageLinks.map(imageLink => this.#imageNode(imageLink, 100)),
 						this.#textNode(' ')
 					)
 				),
