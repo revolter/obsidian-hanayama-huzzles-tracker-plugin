@@ -2,7 +2,7 @@ import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
 import { Table } from 'mdast';
 import { toString } from 'mdast-util-to-string';
-import { Editor, MarkdownView, Notice, Plugin, requestUrl } from 'obsidian';
+import { Notice, Plugin, requestUrl } from 'obsidian';
 import { remark } from 'remark';
 import remarkGFM from 'remark-gfm';
 import { Root } from 'remark-gfm/lib';
@@ -13,15 +13,15 @@ class HanayamaHuzzle {
 		public index: string,
 		public name: string,
 		public imageLinks: string[],
-		public status: string = ''
+		public status = ''
 	) {}
 }
 
 export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
-	static #startMarker: string = '<!-- Hanayama Huzzles start -->';
-	static #endMarker: string = '<!-- Hanayama Huzzles end -->';
-	static #headers: string[] = ['Level', 'Index', 'Name', 'Picture', 'Status'];
-	static #scrapeUrls: string[] = [
+	static #startMarker = '<!-- Hanayama Huzzles start -->';
+	static #endMarker = '<!-- Hanayama Huzzles end -->';
+	static #headers = ['Level', 'Index', 'Name', 'Picture', 'Status'];
+	static #scrapeUrls = [
 		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-1-fun',
 		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-2-easy',
 		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-3-normal',
@@ -34,8 +34,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		this.addCommand({
 			id: 'update-list',
 			name: 'Update list',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const content: string = editor.getValue();
+			editorCallback: (editor, view) => {
+				const content = editor.getValue();
 
 				this.#updatedListInContent(content).then( newContent => {
 					editor.setValue(newContent);
@@ -49,20 +49,20 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	onunload() {}
 
 	async #updatedListInContent(content: string): Promise<string> {
-		const escapedStartMarker: string = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#startMarker);
-		const escapedEndMarker: string = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#endMarker);
+		const escapedStartMarker = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#startMarker);
+		const escapedEndMarker = escapeStringRegExp(HanayamaHuzzlesTrackerPlugin.#endMarker);
 
-		const regex: RegExp = new RegExp(`${escapedStartMarker}(?<markdownList>.*?)${escapedEndMarker}`, 's');
-		const match: RegExpMatchArray | null = content.match(regex);
+		const regex = new RegExp(`${escapedStartMarker}(?<markdownList>.*?)${escapedEndMarker}`, 's');
+		const match = content.match(regex);
 
 		if (match != null && match.groups != null) {
-			const markdownList: string = match.groups.markdownList;
-			const currentHuzzles: HanayamaHuzzle[] = this.#markdownTableToHuzzles(markdownList);
-			const updatedMarkdownList: string = await this.#updatedHuzzles(currentHuzzles);
+			const markdownList = match.groups.markdownList;
+			const currentHuzzles = this.#markdownTableToHuzzles(markdownList);
+			const updatedMarkdownList = await this.#updatedHuzzles(currentHuzzles);
 
 			return content.replace(regex, updatedMarkdownList);
 		} else {
-			const updatedMarkdownList: string = await this.#updatedHuzzles([]);
+			const updatedMarkdownList = await this.#updatedHuzzles([]);
 
 			return dedent
 				`${content}
@@ -83,7 +83,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			huzzle.status = indexedCurrentHuzzles[huzzle.name] || '';
 		});
 
-		const updatedList: string = this.#huzzlesToMarkdownTableString(HanayamaHuzzlesTrackerPlugin.#headers, huzzles);
+		const updatedList = this.#huzzlesToMarkdownTableString(HanayamaHuzzlesTrackerPlugin.#headers, huzzles);
 
 		return dedent
 			`${HanayamaHuzzlesTrackerPlugin.#startMarker}
@@ -107,11 +107,11 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 		const content = container.content;
 		const products = Array.from(content.querySelectorAll('#main>.products>.product'));
-		const metadataRegex: RegExp = new RegExp(/(?<=\w+[ ])(?<level>\d+)-(?<index>\d+)[ ](?<name>.+)/); // https://regex101.com/r/1vGzHd/1
+		const metadataRegex = new RegExp(/(?<=\w+[ ])(?<level>\d+)-(?<index>\d+)[ ](?<name>.+)/); // https://regex101.com/r/1vGzHd/1
 
 		return products.flatMap(product => {
 			const title = product.querySelector('.product-info>.product-title>a')?.textContent || '';
-			const titleMatch: RegExpMatchArray | null = title.match(metadataRegex);
+			const titleMatch = title.match(metadataRegex);
 
 			if (titleMatch == null || titleMatch.groups == null) {
 				return [];
@@ -204,7 +204,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		const ast = remark()
 			.use(remarkGFM)
 			.parse(markdownTableString);
-		const table: Table = ast.children.find(node => node.type === 'table') as Table;
+		const table = ast.children.find(node => node.type === 'table') as Table;
 		const arrayOfArrays = table.children.map(row =>
 			row.children.map(cell =>
 				cell.children.map(child => {
@@ -215,7 +215,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				}).join('')
 			)
 		);
-		const imageLinksRegex: RegExp = new RegExp(/(?<=!\[[^\]]+\]\()(?<link>[^)]+)(?=\))/g); // https://regex101.com/r/YlCOgc/1
+		const imageLinksRegex = new RegExp(/(?<=!\[[^\]]+\]\()(?<link>[^)]+)(?=\))/g); // https://regex101.com/r/YlCOgc/1
 
 		return arrayOfArrays.flatMap(array => {
 			if (array.length < 5) {
