@@ -1,6 +1,6 @@
 import dedent from 'dedent';
 import escapeStringRegExp from 'escape-string-regexp';
-import { Image, PhrasingContent, Table, TableCell, Text } from 'mdast';
+import { Image, PhrasingContent, Table, TableCell, TableRow, Text } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import { Notice, Plugin, requestUrl } from 'obsidian';
 import { remark } from 'remark';
@@ -129,13 +129,9 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 	}
 
 	#huzzlesToMarkdownTableString(headers: string[], huzzles: HanayamaHuzzle[]): string {
-		const headerRow = {
-			type: 'tableRow',
-			children: headers.map(header => this.#textTableCellNode(header))
-		};
-		const huzzleRows = huzzles.map(huzzle => ({
-			type: 'tableRow',
-			children: [
+		const headerRow = this.#tableRowNode(headers.map(header => this.#textTableCellNode(header)));
+		const huzzleRows = huzzles.map(huzzle =>
+			this.#tableRowNode([
 				this.#textTableCellNode(huzzle.level),
 				this.#textTableCellNode(huzzle.index),
 				this.#textTableCellNode(huzzle.name),
@@ -146,8 +142,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 					)
 				),
 				this.#textTableCellNode(huzzle.status)
-			]
-		}));
+			])
+		);
 		const tableRows = [
 			...[headerRow],
 			...huzzleRows
@@ -165,6 +161,13 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			.use(remarkGFM)
 			.stringify(root)
 			.replace(/\n$/, '');
+	}
+
+	#tableRowNode(children: TableCell[]): TableRow {
+		return {
+			type: 'tableRow',
+			children: children
+		}
 	}
 
 	#textTableCellNode(text: string): TableCell {
