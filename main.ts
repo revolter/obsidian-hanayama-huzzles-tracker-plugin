@@ -27,7 +27,8 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-3-normal',
 		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-4-hard',
 		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-5-expert',
-		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-6-grand-master'
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/level-6-grand-master',
+		'https://hanayama-toys.com/product-category/puzzles/huzzle/chess-puzzle'
 	]
 
 	async onload() {
@@ -116,13 +117,19 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			const title = product.querySelector('.product-info > .product-title > a')?.textContent || '';
 			const titleMatch = title.match(metadataRegex);
 
-			if (titleMatch == null || titleMatch.groups == null) {
-				return [];
-			}
+			let level: string
+			let index: string
+			let name: string
 
-			const level = titleMatch.groups.level;
-			const index = titleMatch.groups.index;
-			const name = titleMatch.groups.name;
+			if (titleMatch != null && titleMatch.groups != null) {
+				level = titleMatch.groups.level;
+				index = titleMatch.groups.index;
+				name = titleMatch.groups.name;
+			} else {
+				level = 'N/A';
+				index = 'N/A';
+				name = title;
+			}
 
 			const images = product.querySelectorAll('.product-thumb > a > img');
 			const imageLinks = Array.from(images, image => (image as HTMLImageElement).src);
