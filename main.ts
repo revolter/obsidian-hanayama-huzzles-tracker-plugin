@@ -108,11 +108,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 	async #scrapeHuzzles(url: string): Promise<HanayamaHuzzle[]> {
 		const response = await requestUrl(url);
-
-		const container = document.createElement('template');
-		container.innerHTML = response.text;
-
-		const content = container.content;
+		const content = new DOMParser().parseFromString(response.text, 'text/html');
 		const products = Array.from(content.querySelectorAll('#main > .products > .product'));
 		const metadataRegex = new RegExp(/\w+[ ](?<level>\d+)-(?<index>\d+)[ ](?<name>.+)/); // https://regex101.com/r/1vGzHd/2
 
