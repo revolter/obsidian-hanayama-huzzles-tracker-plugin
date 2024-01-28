@@ -37,10 +37,12 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			editorCallback: (editor, _view) => {
 				const content = editor.getValue();
 
+				new Notice('List update started');
+
 				this.#updatedListInContent(content).then( newContent => {
 					editor.setValue(newContent);
 
-					new Notice('List updated!');
+					new Notice('List update finished');
 				});
 			}
 		});
