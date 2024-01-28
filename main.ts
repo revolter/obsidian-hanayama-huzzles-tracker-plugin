@@ -38,11 +38,14 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				const content = editor.getValue();
 
 				new Notice('List update started');
+				const startDate = new Date();
 
 				this.#updatedListInContent(content).then( newContent => {
 					editor.setValue(newContent);
 
-					new Notice('List update finished');
+					const endDate = new Date();
+					const seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+					new Notice(`List update finished in ${seconds} seconds`);
 				});
 			}
 		});
