@@ -113,11 +113,11 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 		container.innerHTML = response.text;
 
 		const content = container.content;
-		const products = Array.from(content.querySelectorAll('#main>.products>.product'));
+		const products = Array.from(content.querySelectorAll('#main > .products > .product'));
 		const metadataRegex = new RegExp(/\w+[ ](?<level>\d+)-(?<index>\d+)[ ](?<name>.+)/); // https://regex101.com/r/1vGzHd/2
 
 		return products.flatMap(product => {
-			const title = product.querySelector('.product-info>.product-title>a')?.textContent || '';
+			const title = product.querySelector('.product-info > .product-title > a')?.textContent || '';
 			const titleMatch = title.match(metadataRegex);
 
 			if (titleMatch == null || titleMatch.groups == null) {
@@ -128,7 +128,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 			const index = titleMatch.groups.index;
 			const name = titleMatch.groups.name;
 
-			const images = product.querySelectorAll('.product-thumb>a>img');
+			const images = product.querySelectorAll('.product-thumb > a > img');
 			const imageLinks = Array.from(images, image => (image as HTMLImageElement).src);
 
 			return new HanayamaHuzzle(level, index, name, imageLinks);
