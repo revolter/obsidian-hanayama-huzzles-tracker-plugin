@@ -109,7 +109,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 		const content = container.content;
 		const products = Array.from(content.querySelectorAll('#main>.products>.product'));
-		const metadataRegex = new RegExp(/(?<=\w+[ ])(?<level>\d+)-(?<index>\d+)[ ](?<name>.+)/); // https://regex101.com/r/1vGzHd/1
+		const metadataRegex = new RegExp(/\w+[ ](?<level>\d+)-(?<index>\d+)[ ](?<name>.+)/); // https://regex101.com/r/1vGzHd/2
 
 		return products.flatMap(product => {
 			const title = product.querySelector('.product-info>.product-title>a')?.textContent || '';
@@ -217,7 +217,7 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 				}).join('')
 			)
 		);
-		const imageLinksRegex = new RegExp(/(?<=!\[[^\]]+\]\()(?<link>[^)]+)(?=\))/g); // https://regex101.com/r/YlCOgc/1
+		const imageLinksRegex = new RegExp(/!\[[^\]]+\]\((?<link>[^)]+)(?=\))/g); // https://regex101.com/r/YlCOgc/2
 
 		return arrayOfArrays.flatMap(array => {
 			if (array.length < 5) {
