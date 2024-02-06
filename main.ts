@@ -80,17 +80,26 @@ export default class HanayamaHuzzlesTrackerPlugin extends Plugin {
 
 	async #updatedHuzzles(currentHuzzles: HanayamaHuzzle[]): Promise<string> {
 		const indexedCurrentHuzzles = currentHuzzles.slice(1).reduce((map, huzzle) => {
-			map[huzzle.name] = huzzle.status;
+			map[huzzle.name] = huzzle;
 
 			return map;
-		}, {} as {[key: string]: string});
+		}, {} as {[key: string]: HanayamaHuzzle});
 
 		const huzzles = (await this.#scrapeAllHuzzles()).flat();
 		huzzles.forEach( huzzle => {
-			huzzle.status = indexedCurrentHuzzles[huzzle.name] || '';
+			const indexedCurrentHuzzle = indexedCurrentHuzzles[huzzle.name];
+
+			if (indexedCurrentHuzzle !== undefined) {
+				huzzle.status = indexedCurrentHuzzle.status;
+
+				delete indexedCurrentHuzzles[huzzle.name];
+			}
 		});
 
-		const updatedList = this.#huzzlesToMarkdownTableString(HanayamaHuzzlesTrackerPlugin.#headers, huzzles);
+		const withdrawnHuzzles = Object.keys(indexedCurrentHuzzles).map(key => indexedCurrentHuzzles[key]);
+		const withdrawnModifiedHuzzles = withdrawnHuzzles.filter(huzzle => huzzle.status !== '');
+
+		const updatedList = this.#huzzlesToMarkdownTableString(HanayamaHuzzlesTrackerPlugin.#headers, [...huzzles, ...withdrawnModifiedHuzzles]);
 
 		return dedent`
 			${HanayamaHuzzlesTrackerPlugin.#startMarker}
