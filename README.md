@@ -1,3 +1,14 @@
+> [!WARNING]
+> Deprecated in favour of
+> [Track-a-Lot](https://github.com/revolter/obsidian-track-a-lot-plugin)
+> (https://obsidian.md/plugins?id=track-a-lot).
+>
+> Migration instructions:
+> - Uninstall this plugin
+> - Install the Track-a-Lot plugin
+> - Open `Settings` > `Track-a-Lot`
+> - Enable the `Hanayama Huzzles` recipe
+
 # Hanayama Huzzles Tracker Plugin
 
 This is a Hanayama Huzzle puzzles tracker plugin for Obsidian (https://obsidian.md).
